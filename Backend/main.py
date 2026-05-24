@@ -35,7 +35,13 @@ async def upload_file(file: UploadFile = File(...)):
     
     df_store["current"] = df
     df_store["filename"] = file.filename
-    return analyze(df)
+    return {
+        "analysis": analyze(df),
+        "preview": {
+            "columns": df.columns.tolist(),
+            "rows": df.head(10).fillna("N/A").to_dict(orient="records")
+        }
+    }
 
 class QueryBody(BaseModel):
     sql: str

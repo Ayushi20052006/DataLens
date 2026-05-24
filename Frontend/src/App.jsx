@@ -6,7 +6,7 @@ import {
   Legend, ResponsiveContainer
 } from "recharts";
 
-const API = "http://localhost:8000";
+const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
 const PALETTE = ["#0F4C81", "#2E86AB", "#A8DADC", "#457B9D", "#1D3557", "#6B9080"];
 
 /* ── tiny design tokens ── */
@@ -141,7 +141,7 @@ const UploadZone = ({ onFile, filename, loading }) => {
 };
 
 /* ── SQL console ── */
-const SqlConsole = ({ onRun, result }) => {
+const SqlConsole = ({ onRun, result, columns = [] }) => {
   const [sql, setSql] = useState("SELECT * FROM dataset LIMIT 10");
   const presets = [
     { label: "preview", sql: "SELECT * FROM dataset LIMIT 10" },
@@ -149,6 +149,17 @@ const SqlConsole = ({ onRun, result }) => {
     { label: "group by col1", sql: "SELECT {col1}, COUNT(*) as count FROM dataset GROUP BY {col1} ORDER BY count DESC LIMIT 10" },
     { label: "null check", sql: "SELECT COUNT(*) as total, COUNT({col1}) as non_null FROM dataset" },
   ];
+
+  const handlePresetClick = (presetSql) => {
+    let resolvedSql = presetSql;
+    if (presetSql.includes("{col1}")) {
+      const col1 = columns.length > 0 ? columns[0] : "col1";
+      const needsEscaping = !/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(col1);
+      const escapedCol = needsEscaping ? `\`${col1}\`` : col1;
+      resolvedSql = presetSql.replaceAll("{col1}", escapedCol);
+    }
+    setSql(resolvedSql);
+  };
 
   return (
     <Card>
@@ -163,7 +174,7 @@ const SqlConsole = ({ onRun, result }) => {
       {/* preset buttons */}
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
         {presets.map(p => (
-          <button key={p.label} onClick={() => setSql(p.sql)} style={{
+          <button key={p.label} onClick={() => handlePresetClick(p.sql)} style={{
             fontSize: 11, padding: "3px 10px", borderRadius: 6, border: `1px solid ${T.border}`,
             background: T.bg, color: T.muted, cursor: "pointer", fontFamily: "'DM Mono', monospace"
           }}>{p.label}</button>
@@ -241,14 +252,17 @@ export default function App() {
     const fd = new FormData();
     fd.append("file", file);
     try {
-      const [res, prev] = await Promise.all([
-        axios.post(`${API}/upload`, fd),
-        axios.post(`${API}/upload`, fd).then(() => axios.get(`${API}/preview`))
-      ]);
-      setData(res.data);
-      setPreview(prev.data);
+      const res = await axios.post(`${API}/upload`, fd);
+      if (res.data.error) {
+        setError(res.data.error);
+        setFilename("");
+      } else {
+        setData(res.data.analysis);
+        setPreview(res.data.preview);
+      }
     } catch {
       setError("Upload failed — make sure the backend is running on port 8000.");
+      setFilename("");
     }
     setLoading(false);
   }
@@ -538,7 +552,7 @@ export default function App() {
             {activeNav === "sql" && (
               <>
                 <SectionLabel>SQL query console</SectionLabel>
-                <SqlConsole onRun={handleQuery} result={queryResult} />
+                <SqlConsole onRun={handleQuery} result={queryResult} columns={data?.columns || []} />
               </>
             )}
 
