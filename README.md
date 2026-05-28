@@ -2,6 +2,8 @@
 
 DataLens is an elegant, real-time data exploration and profiling dashboard designed to process CSV or Excel spreadsheets, visualize their distributions, and execute raw SQL queries using an in-memory database—all with **zero configuration** required.
 
+🌐 **Live Vercel Application:** [https://data-lens-sepia.vercel.app/](https://data-lens-sepia.vercel.app/)
+
 ---
 
 ## 🏛️ System Architecture
@@ -28,7 +30,11 @@ graph LR
 
 ---
 
-## 🚀 One-Command Dev Setup
+## 🚀 How to Run the Site
+
+You can run the full application either using the quick automated runner script or by starting the backend and frontend services manually.
+
+### Option A: Quick Dev Setup (Automated Script)
 
 To get both the FastAPI backend and the React frontend up and running concurrently with a single command, execute the provided startup script in the repository root:
 
@@ -38,9 +44,43 @@ chmod +x start.sh
 ```
 
 This shell runner script automatically:
-* Installs backend Python dependencies in your virtual environment (if present) or global environment.
+* Installs/updates backend Python dependencies in your virtual environment or global environment.
 * Boots the FastAPI gateway server via `uvicorn` on **`http://localhost:8000`**.
 * Installs node packages and boots the React + Vite frontend compiler on **`http://localhost:5173`**.
+
+### Option B: Manual Setup (Step-by-Step)
+
+If you prefer to run the services in separate terminal windows, follow these instructions:
+
+#### 1. Start the FastAPI Backend
+Open a terminal window and navigate to the `Backend` directory:
+```bash
+cd Backend
+
+# (Optional) Create and activate a virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Start the API server
+uvicorn main:app --reload --port 8000
+```
+The backend API documentation will be available at [http://localhost:8000/docs](http://localhost:8000/docs).
+
+#### 2. Start the React Frontend
+Open a new terminal window and navigate to the `Frontend` directory:
+```bash
+cd Frontend
+
+# Install node dependencies
+npm install
+
+# Start the Vite dev server
+npm run dev
+```
+The client dashboard will be available at [http://localhost:5173/](http://localhost:5173/).
 
 ---
 
