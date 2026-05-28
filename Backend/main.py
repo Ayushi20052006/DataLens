@@ -11,7 +11,10 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://data-lens-sepia.vercel.app/"],
+    allow_origins=[
+        "https://data-lens-sepia.vercel.app",
+        "http://localhost:5173",
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
