@@ -84,6 +84,48 @@ The client dashboard will be available at [http://localhost:5173/](http://localh
 
 ---
 
+## ✨ Interactive Dashboard Features
+
+DataLens is equipped with an elegant state-driven SPA workspace that categorizes dataset exploration into 5 specialized interactive panels:
+
+1. **📊 Overview Workspace**:
+   * **Real-time Stat Cards**: Tracks high-level indicators like total records loaded, fields detected, numeric/text column splits, missing value counters, and an overall **Data Quality completeness percentage**.
+   * **Multi-Format Previews**: A dynamic visualization block permitting users to toggle instantly between **Bar**, **Line**, and **Area** representations of the dataset's numerical distributions.
+2. **📈 Charts (Visualizations)**:
+   * Displays a 2x2 grid containing specialized graphical visualizations powered by `recharts`:
+     * **Bar Chart**: Enables direct, row-by-row comparisons of numeric values.
+     * **Line Chart**: Traces trends and patterns across records.
+     * **Pie Chart**: Visualizes categorical splits and proportions for text columns.
+     * **Area Chart**: Shows smooth, gradient-filled distribution shapes.
+3. **📋 Columns (Schema Diagnostics)**:
+   * Evaluates dataset schema health at a database level.
+   * Auto-identifies data types (`numeric`, `text`, `datetime`).
+   * Displays distinct unique counts and null values per column.
+   * Employs linear progress bars mapping missing value ratios alongside automated health badges (`Good` for < 5% nulls, `Fair` for 5-20%, `Poor` for > 20%).
+4. **💾 SQL Console**:
+   * An advanced, interactive workspace that materializes the active pandas dataset into a virtual table named `dataset`.
+   * **Dynamic presets**: Select templates like `preview`, `row count`, `group by col1`, and `null check` that automatically auto-complete using the dataset's detected schema.
+   * **Interactive tables**: Renders execution outputs in an elegant, custom-styled scrollable grid.
+   * **Error Interceptor**: Catches and displays detailed syntax error logs directly within the UI context.
+5. **🔍 Data Viewer**:
+   * A clean database-style tabular viewer displaying the first 10 rows of the raw dataset, enabling swift, manual data audits.
+
+---
+
+## 🌐 Production Configuration & Deployment
+
+DataLens is fully optimized and configured for seamless, automated multi-platform production deployments:
+
+* **FastAPI Backend Service**:
+  * Configured via `Backend/render.yaml` to build and deploy to **Render** web services.
+  * Explicitly runs on a Python 3.11.0 runtime environment as specified in `runtime.txt`.
+  * Implements explicit Cross-Origin Resource Sharing (CORS) in `main.py` to securely permit HTTP actions from the client domain.
+* **React Frontend Application**:
+  * Seamlessly structured for hosting on **Vercel** as a single-page application.
+  * Implements dynamic API routing using Vite's production environment variables: `VITE_API_URL` (configured in `.env.production` pointing to the live backend server `https://datalens-vmzu.onrender.com`), falling back to local `http://localhost:8000` during development.
+
+---
+
 ## 🐍 Backend API Documentation
 
 The FastAPI gateway automatically generates high-fidelity OpenAPI specifications and interactive playgrounds. Once the backend services are running, you can explore, test, and execute API endpoints directly from the browser:

@@ -22,9 +22,7 @@ sequenceDiagram
     FE->>BE: POST /upload (FormData containing file binary)
     Note over BE: Parses via Pandas (io.BytesIO)<br/>Updates local in-memory store
     BE->>BE: Generate descriptive stats (shape, unique counts, null %, etc.)
-    BE-->>FE: Return JSON (Initial Profile Statistics)
-    FE->>BE: GET /preview (triggers preview fetch)
-    BE-->>FE: Return JSON (First 10 rows schema)
+    BE-->>FE: Return JSON (Initial Profile Statistics & First 10 rows preview)
     FE-->>User: Render Dashboard (Overview Cards & Chart Preview)
 
     %% Flow 2: Running SQL Queries
@@ -59,7 +57,7 @@ sequenceDiagram
   * **Missing Value Map**: Raw count and calculated null percentages per field.
   * **Cardinality Stats**: Counts of distinct unique values per field.
   * **Statistical Distribution**: Quartiles, min, max, means, standard deviations (via `df.describe()`).
-* **UI Render**: Once the React app receives this JSON, it unlocks the **Overview** dashboard, rendering key metric cards (Data Quality percentage, Text count, Numeric count) and initial Recharts chart projections.
+* **UI Render**: Once the React app receives this JSON (which includes both `analysis` and `preview` datasets), it unlocks the **Overview** dashboard, rendering key metric cards (Data Quality percentage, Text count, Numeric count), initial Recharts projections, and populates the other navigation tabs instantly without requiring additional network queries.
 
 ### 3️⃣ Visualization Rendering
 * **Data Projection**: The React app reads the returned dataset schema and finds numeric columns automatically.
